@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "backend-livros-ebac-python"
+version = "0.1.0"
+description = "API FastAPI com cache Redis para livros"
+authors = ["Afranio <afraniorogerio@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+fastapi = {extras = ["standard"], version = ">=0.115.12,<0.116.0"}
+sqlalchemy = ">=2.0.42,<3.0.0"
+aiosqlite = ">=0.21.0,<0.22.0"
+redis = "^7.4.0"
+celery = "^5.6.3"
+kafka-python = "^2.3.1"
+pytest = "^9.0.3"
+pytest-cov = "^7.1.0"
+pydantic-core = "^2.47.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+
+
+
+[dependency-groups]
+dev = [
+    "pytest-mock (>=3.15.1,<4.0.0)"
+]
