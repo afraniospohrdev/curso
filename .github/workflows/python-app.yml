@@ -19,20 +19,19 @@ jobs:
     steps:
     - name: Checkout do código
       uses: actions/checkout@v3
-     
+
     - name: Instalar Python
-      uses: actions/setup-python@v  
+      uses: actions/setup-python@v5
       with:
         python-version: "3.12"
-        
+
     - name: Instalar Poetry
       run: |
-        curl -sSL -https://install.python-poetry.org |python3 -
+        curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
 
     - name: Instalar dependências com Poetry
       run: poetry install --no-interaction --no-root
 
-    - name: Rodar testes (placeholder)
-      run: echo "Nenhum teste configurado ainda."
-       
+    - name: Rodar pytest
+      run: poetry run pytest
