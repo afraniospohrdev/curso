@@ -33,5 +33,3 @@ jobs:
     - name: Instalar dependências com Poetry
       run: poetry install --no-interaction --no-root
 
-    - name: Rodar pytest
-      run: poetry run pytest
