@@ -23,13 +23,23 @@ jobs:
     - name: Instalar Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.9"
 
     - name: Instalar Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
         echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+    - name: Cache de dependências do Poetry
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
     - name: Instalar dependências com Poetry
       run: poetry install --no-interaction --no-root
 
+    - name: Rodar testes
+      run: poetry run pytest
