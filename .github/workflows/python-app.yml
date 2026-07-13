@@ -23,7 +23,9 @@ jobs:
         python-version: "3.12"
 
     - name: Instalar Poetry
-      run: pip install poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
     - name: Cache de dependências do Poetry
       uses: actions/cache@v3
@@ -36,5 +38,5 @@ jobs:
     - name: Instalar dependências com Poetry
       run: poetry install --no-interaction --no-root
 
-    - name: Rodar pytest
+    - name: Rodar testes
       run: poetry run pytest
