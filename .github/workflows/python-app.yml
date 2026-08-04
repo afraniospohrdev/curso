@@ -9,6 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Checkout repository
@@ -22,14 +32,15 @@ jobs:
     - name: Install Poetry
       run: pip install poetry
 
-    # Instala apenas dependências, sem empacotar o projeto
+    - name: Generate lock file
+      run: poetry lock
+
     - name: Install dependencies
       run: poetry install --no-root
 
     - name: Run tests
-      run: poetry run pytest
+      run: PYTEST_RUNNING=1 PYTHONPATH=. poetry run pytest
 
-    # Etapa de build Docker
     - name: Build Docker image
       run: docker build -t fastapi-app:latest .
 
@@ -39,5 +50,3 @@ jobs:
         sleep 5
         docker ps | grep fastapi-test
         docker stop fastapi-test
-
-      
