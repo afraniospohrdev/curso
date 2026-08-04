@@ -55,12 +55,20 @@ class Livro(BaseModel):
     autor_livro: str
     ano_livro: int
 
-class LivroDB(Base):
-    __tablename__ = "livros"
-    id = Column(Integer, primary_key=True, index=True)
-    nome_livro = Column(String, nullable=False)
-    autor_livro = Column(String, nullable=False)
-    ano_livro = Column(Integer, nullable=False)
+# importa o modelo definido em models.py (arquivo na raiz)
+from models import LivroDB
+
+# cria a aplicação FastAPI (se ainda não existir)
+# app já está definido mais acima no seu main.py
+
+# expõe uma sessão para dependências (nome usado nos testes)
+def sessao_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 # Cria as tabelas no banco
 Base.metadata.create_all(bind=engine)
