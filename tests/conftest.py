@@ -1,5 +1,5 @@
 import pytest
-from app.main import Base, engine
+from main import Base, engine   # importa direto da raiz
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
@@ -8,3 +8,4 @@ def setup_database():
     yield
     # Opcional: limpar depois
     Base.metadata.drop_all(bind=engine)
+
