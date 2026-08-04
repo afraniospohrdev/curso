@@ -1,27 +1,5 @@
 # API de livros
 
-# GET, POST, PUT, DELETE
-
-# Get - Buscar os dados dos livros(CREATE)
-# Post - Adicionar novos livros(Read)
-# Put - Atualizar informações dos livros(Update)
-# Delete - Deletar informações dos livros(Delete)
-
-# CRUD
-
-# Create
-# Read
-# Update
-# Delete
-
-# vamos acessar nosso Endpoint
-# E vamos acessar os PATH's do nosso Endpoint
-
-# Path ou Rota
-# Query Strings
-
-# 200 300 400 500
-
 # Documentação Swagger -> Documentar os endpoints da nossa aplicação (da nossa API)
 
 # Olha, acessa minha documentação swagger nesse endpoint -> http://endpointdelivros/docs/
@@ -40,10 +18,12 @@ from celery_app import celery_app
 from celery.result import AsyncResult
 from kafka_producer import enviar_evento
 
-from sqlalchemy import Column, Integer, String
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from main import Base
+# SQLAlchemy moved to db.py
+from db import engine, SessionLocal, Base
+
+# importe modelos para registrar as classes no MetaData
+# ajuste o caminho se estiver em app.models
+import models  # garante que LivroDB seja registrado
 
 import asyncio
 
