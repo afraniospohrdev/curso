@@ -40,18 +40,17 @@ from celery_app import celery_app
 from celery.result import AsyncResult
 from kafka_producer import enviar_evento
 
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from main import Base
 
 import asyncio
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-
 # Para testes, use banco em memória
 if os.getenv("PYTEST_RUNNING"):
     DATABASE_URL = "sqlite:///:memory:"
-
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
