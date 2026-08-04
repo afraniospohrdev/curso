@@ -4,37 +4,28 @@
 
 # Olha, acessa minha documentação swagger nesse endpoint -> http://endpointdelivros/docs/
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 from typing import Optional
 import secrets
 import os
 import redis
-import json 
-from fastapi import BackgroundTasks
+import json
+import asyncio
+
 from tasks import fatorial, somar
 from celery_app import celery_app
 from celery.result import AsyncResult
 from kafka_producer import enviar_evento
 
-# SQLAlchemy moved to db.py
+# Importa a configuração do banco (engine, SessionLocal, Base) de db.py
 from db import engine, SessionLocal, Base
 
-# importe modelos para registrar as classes no MetaData
-# ajuste o caminho se estiver em app.models
+# importa modelos para registrar as classes no MetaData
 import models  # garante que LivroDB seja registrado
 
-import asyncio
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-# Para testes, use banco em memória
-if os.getenv("PYTEST_RUNNING"):
-    DATABASE_URL = "sqlite:///:memory:"
-
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+# NÃO recrie engine/session/base aqui — já vêm de db.py
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
