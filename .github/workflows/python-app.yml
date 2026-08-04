@@ -22,9 +22,10 @@ jobs:
     - name: Install Poetry
       run: pip install poetry
 
+    # Instala apenas dependências, sem empacotar o projeto
     - name: Install dependencies
-      run: poetry install
-      
+      run: poetry install --no-root
+
     - name: Run tests
       run: poetry run pytest
 
@@ -36,7 +37,7 @@ jobs:
       run: |
         docker run --rm -d -p 8000:8000 --name fastapi-test fastapi-app:latest
         sleep 5
-        # Verifica se o container está rodando
         docker ps | grep fastapi-test
-        # Finaliza o container
         docker stop fastapi-test
+
+      
