@@ -2,41 +2,41 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "**" ]
 
 jobs:
-  fastapi-testes:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout do código
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Instalar Python
-      uses: actions/setup-python@v5
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.12"
+        python-version: "3.11"
 
-    - name: Instalar Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Install Poetry
+      run: pip install poetry
 
-    - name: Cache de dependências do Poetry
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pypoetry
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
-
-    - name: Instalar dependências com Poetry
-      run: poetry install --no-interaction --no-root
-
-    - name: Rodar testes
+    - name: Install dependencies
+      run: poetry install
+      
+    - name: Run tests
       run: poetry run pytest
+
+    # Etapa de build Docker
+    - name: Build Docker image
+      run: docker build -t fastapi-app:latest .
+
+    - name: Run Docker container (smoke test)
+      run: |
+        docker run --rm -d -p 8000:8000 --name fastapi-test fastapi-app:latest
+        sleep 5
+        # Verifica se o container está rodando
+        docker ps | grep fastapi-test
+        # Finaliza o container
+        docker stop fastapi-test
