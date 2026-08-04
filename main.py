@@ -12,8 +12,8 @@ import secrets
 import os
 import redis
 import json
+# outros imports já existentes...
 import asyncio
-
 from tasks import fatorial, somar
 from celery_app import celery_app
 from celery.result import AsyncResult
@@ -24,8 +24,10 @@ from db import engine, SessionLocal, Base
 
 # importa modelos para registrar as classes no MetaData
 import models  # garante que LivroDB seja registrado
+from models import LivroDB  # reexporta LivroDB para compatibilidade com os testes
 
-# NÃO recrie engine/session/base aqui — já vêm de db.py
+# importa o tipo Session usado nas anotações de dependência
+from sqlalchemy.orm import Session
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
