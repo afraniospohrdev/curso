@@ -12,8 +12,8 @@ import secrets
 import os
 import redis
 import json
-# outros imports já existentes...
 import asyncio
+
 from tasks import fatorial, somar
 from celery_app import celery_app
 from celery.result import AsyncResult
@@ -24,6 +24,7 @@ from db import engine, SessionLocal, Base
 
 # importa modelos para registrar as classes no MetaData
 import models  # garante que LivroDB seja registrado
+from models import LivroDB  # reexporta LivroDB para compatibilidade com os testes
 
 # importa o tipo Session usado nas anotações de dependência
 from sqlalchemy.orm import Session
@@ -37,32 +38,19 @@ app = FastAPI(
     title="API de Livros",
     description="API para gerenciar catalogo de livros.",
     version="1.0.0",
-    contact={ 
-        "name":"Afranio Spohr",
-        "email":"afraniorogerio@gmail.com"
-        }
+    contact={
+        "name": "Afranio Spohr",
+        "email": "afraniorogerio@gmail.com"
+    }
 )
 
-# variveis de ambiente
-MEU_USUARIO = "admin"
-MINHA_SENHA = "admin"
-
-security = HTTPBasic()
-
-livros = []
-
+# modelo Pydantic
 class Livro(BaseModel):
     nome_livro: str
     autor_livro: str
     ano_livro: int
 
-# importa o modelo definido em models.py (arquivo na raiz)
-from models import LivroDB
-
-# cria a aplicação FastAPI (se ainda não existir)
-# app já está definido mais acima no seu main.py
-
-# expõe uma sessão para dependências (nome usado nos testes)
+# Sessão de dependência (apenas uma definição)
 def sessao_db():
     db = SessionLocal()
     try:
@@ -70,6 +58,8 @@ def sessao_db():
     finally:
         db.close()
 
+# cria a aplicação FastAPI (se ainda não existir)
+# app já está definido mais acima no seu main.py
 
 def salvar_livro_redis(livro_id: int, livro: Livro):
     redis_client.set(f"livro:{livro_id}", json.dumps(livro.dict()))
