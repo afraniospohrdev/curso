@@ -1,21 +1,22 @@
-# db.py
+# db.py (trecho relevante)
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from urllib.parse import urlparse
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-# se estivermos rodando testes, force in-memory (opcional) — mas CI usará arquivo se você setar DATABASE_URL no workflow
 if os.getenv("PYTEST_RUNNING"):
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///:memory:")
+    # respeita DATABASE_URL se definido; caso contrário, usa arquivo local
+    DATABASE_URL = os.getenv("DATABASE_URL", DATABASE_URL)
 
-# connect_args só para sqlite
+# se for sqlite com caminho relativo, converte para absoluto
+if DATABASE_URL.startswith("sqlite:///"):
+    path = DATABASE_URL.replace("sqlite:///", "", 1)
+    if not os.path.isabs(path):
+        path = os.path.abspath(path)
+    DATABASE_URL = f"sqlite:///{path}"
+
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
-# DEBUG opcional (remova depois)
-print("DEBUG db: engine id:", id(engine))
-print("DEBUG db: engine url:", getattr(engine, "url", str(engine)))
-print("DEBUG db: Base tables at import:", list(Base.metadata.tables.keys()))
