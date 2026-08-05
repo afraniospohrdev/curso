@@ -2,21 +2,25 @@
 import os
 import sys
 
-# garante que a raiz do projeto esteja no PYTHONPATH
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-# sinaliza ambiente de teste ANTES de qualquer import que crie engine
+# força o modo de teste ANTES de importar db/main/models
 os.environ.setdefault("PYTEST_RUNNING", "1")
 
-# agora importe db e modelos e crie as tabelas imediatamente
+# opcional: se você preferir usar arquivo sqlite persistente durante CI,
+# descomente a linha abaixo (útil para diagnosticar problemas de in-memory)
+# os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+
 from db import Base, engine
-# importe o módulo que define LivroDB (ajuste se estiver em outro caminho)
+# importe o módulo que define LivroDB (ajuste se estiver em app.models)
 import models  # noqa: F401
 
-# debug opcional: listar tabelas conhecidas
+# debug curto para confirmar que o modelo foi registrado
 print("DEBUG: tabelas registradas no MetaData:", list(Base.metadata.tables.keys()))
+print("DEBUG: engine url:", getattr(engine, "url", str(engine)))
+print("DEBUG: engine id:", id(engine))
 
 # cria as tabelas agora, antes da coleta/import dos testes
 Base.metadata.create_all(bind=engine)
@@ -25,6 +29,5 @@ import pytest
 
 @pytest.fixture(scope="session", autouse=True)
 def teardown_database():
-    # fixture apenas para garantir limpeza ao final da sessão
     yield
     Base.metadata.drop_all(bind=engine)
