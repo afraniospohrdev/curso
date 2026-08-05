@@ -195,13 +195,23 @@ def get_livros(
 
     import sqlalchemy
 
-# debug temporário: mostra engine e tabelas no momento da consulta
-print("DEBUG at query: engine id:", id(engine))
-print("DEBUG at query: engine url:", getattr(engine, "url", str(engine)))
-try:
-    print("DEBUG at query: inspector tables:", sqlalchemy.inspect(engine).get_table_names())
-except Exception as e:
-    print("DEBUG at query: inspector error:", e)
+    # debug temporário: mostra o engine/arquivo que a sessão realmente usa
+    try:
+        bind = getattr(db, "bind", None) or getattr(db, "engine", None) or engine
+        print("DEBUG at query: session bind id:", id(bind))
+        print("DEBUG at query: session bind url:", getattr(bind, "url", str(bind)))
+        print("DEBUG at query: global engine id:", id(engine))
+        print("DEBUG at query: global engine url:", getattr(engine, "url", str(engine)))
+        try:
+            print("DEBUG at query: inspector tables (session):", sqlalchemy.inspect(bind).get_table_names())
+        except Exception as e:
+            print("DEBUG at query: inspector(session) error:", e)
+        try:
+            print("DEBUG at query: inspector tables (global):", sqlalchemy.inspect(engine).get_table_names())
+        except Exception as e:
+            print("DEBUG at query: inspector(global) error:", e)
+    except Exception as e:
+        print("DEBUG at query: unexpected debug error:", e)
 
     
     livros = db.query(LivroDB).offset((page - 1) * limit).limit(limit).all() 
