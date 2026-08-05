@@ -59,7 +59,8 @@ class Livro(BaseModel):
 
 # Sessão de dependência (apenas uma definição)
 def sessao_db():
-    db = SessionLocal()
+    # força o bind da sessão para o engine global, evitando sessões apontando para :memory:
+    db = SessionLocal(bind=engine)
     try:
         yield db
     finally:
