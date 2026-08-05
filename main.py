@@ -192,6 +192,17 @@ def get_livros(
 
     if cached:
         return json.loads(cached)
+
+    import sqlalchemy
+
+# debug temporário: mostra engine e tabelas no momento da consulta
+print("DEBUG at query: engine id:", id(engine))
+print("DEBUG at query: engine url:", getattr(engine, "url", str(engine)))
+try:
+    print("DEBUG at query: inspector tables:", sqlalchemy.inspect(engine).get_table_names())
+except Exception as e:
+    print("DEBUG at query: inspector error:", e)
+
     
     livros = db.query(LivroDB).offset((page - 1) * limit).limit(limit).all() 
 
