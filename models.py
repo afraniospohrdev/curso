@@ -8,3 +8,6 @@ class LivroDB(Base):
     nome_livro = Column(String, nullable=False)
     autor_livro = Column(String, nullable=False)
     ano_livro = Column(Integer, nullable=False)
+
+# debug opcional
+print("DEBUG models: Base tables at import:", list(Base.metadata.tables.keys()))
