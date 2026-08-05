@@ -60,7 +60,7 @@ class Livro(BaseModel):
 # Sessão de dependência (garante bind explícito ao engine global)
 def sessao_db():
     SessionForRoutes = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionForRoutes()
+    db: Session = SessionForRoutes()
     try:
         yield db
     finally:
