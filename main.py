@@ -29,6 +29,13 @@ from models import LivroDB  # reexporta LivroDB para compatibilidade com os test
 # importa o tipo Session usado nas anotações de dependência
 from sqlalchemy.orm import Session
 
+# autenticação básica
+security = HTTPBasic()
+
+# credenciais padrão (use variáveis de ambiente em CI se preferir)
+MEU_USUARIO = os.getenv("MEU_USUARIO", "admin")
+MINHA_SENHA = os.getenv("MINHA_SENHA", "admin")
+
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
