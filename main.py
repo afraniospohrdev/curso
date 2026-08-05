@@ -27,7 +27,7 @@ import models  # garante que LivroDB seja registrado
 from models import LivroDB  # reexporta LivroDB para compatibilidade com os testes
 
 # importa o tipo Session usado nas anotações de dependência
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
 # autenticação básica
 security = HTTPBasic()
@@ -57,10 +57,10 @@ class Livro(BaseModel):
     autor_livro: str
     ano_livro: int
 
-# Sessão de dependência (apenas uma definição)
+# Sessão de dependência (garante bind explícito ao engine global)
 def sessao_db():
-    # força o bind da sessão para o engine global, evitando sessões apontando para :memory:
-    db = SessionLocal(bind=engine)
+    SessionForRoutes = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionForRoutes()
     try:
         yield db
     finally:
