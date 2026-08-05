@@ -39,10 +39,11 @@ jobs:
       run: poetry install --no-root
 
     - name: Run tests
+      env:
+        PYTEST_RUNNING: "1"
+        DATABASE_URL: "sqlite:///./test.db"
+        PYTHONPATH: "."
       run: |
-        export PYTEST_RUNNING=1
-        export DATABASE_URL="sqlite:///./test.db"
-        export PYTHONPATH=.
         poetry run pytest -q -s
 
     - name: Build Docker image
