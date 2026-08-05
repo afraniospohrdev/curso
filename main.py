@@ -24,7 +24,6 @@ from db import engine, SessionLocal, Base
 
 # importa modelos para registrar as classes no MetaData
 import models  # garante que LivroDB seja registrado
-from models import LivroDB  # reexporta LivroDB para compatibilidade com os testes
 
 # importa o tipo Session usado nas anotações de dependência
 from sqlalchemy.orm import Session
@@ -72,21 +71,12 @@ def sessao_db():
         db.close()
 
 
-# Cria as tabelas no banco
-Base.metadata.create_all(bind=engine)
-
 def salvar_livro_redis(livro_id: int, livro: Livro):
     redis_client.set(f"livro:{livro_id}", json.dumps(livro.dict()))
 
 def deletar_livro_redis(id_livro: int):
     redis_client.delete(f"livro:{id_livro}")
 
-def sessao_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 # Essa função tem a responsabilidade de validar o usuario e a senha!
 def autenticar_meu_usuario(credentials: HTTPBasicCredentials = Depends(security)):
