@@ -1,6 +1,5 @@
 # tests/conftest.py
-import os
-import sys
+import os, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
@@ -9,16 +8,15 @@ if ROOT not in sys.path:
 # força modo de teste ANTES de qualquer import que crie engine
 os.environ.setdefault("PYTEST_RUNNING", "1")
 
-# remove módulos que possam ter sido importados antes (garante import limpo)
+# limpa módulos que possam ter sido importados antes
 for m in ("db", "models", "main"):
     if m in sys.modules:
         del sys.modules[m]
 
-# agora importe db e models com PYTEST_RUNNING já definido
 from db import Base, engine
-import models  # noqa: F401
+import models  # registra modelos no MetaData
 
-# debug curto (aparecerá nos logs do GitHub Actions)
+# DEBUG curto (aparecerá nos logs do CI)
 print("DEBUG conftest: Base tables before create_all:", list(Base.metadata.tables.keys()))
 print("DEBUG conftest: engine id:", id(engine))
 print("DEBUG conftest: engine url:", getattr(engine, "url", str(engine)))
