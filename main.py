@@ -27,7 +27,7 @@ import models  # garante que LivroDB seja registrado
 from models import LivroDB  # reexporta LivroDB para compatibilidade com os testes
 
 # importa o tipo Session usado nas anotações de dependência
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 # autenticação básica
 security = HTTPBasic()
@@ -65,6 +65,7 @@ def sessao_db():
         yield db
     finally:
         db.close()
+
 
 # cria a aplicação FastAPI (se ainda não existir)
 # app já está definido mais acima no seu main.py
