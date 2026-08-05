@@ -41,7 +41,7 @@ jobs:
     - name: Run tests
       env:
         PYTEST_RUNNING: "1"
-        DATABASE_URL: "sqlite:///./test.db"
+        DATABASE_URL: "sqlite:///${{ github.workspace }}/test.db"
         PYTHONPATH: "."
       run: |
         poetry run pytest -q -s
