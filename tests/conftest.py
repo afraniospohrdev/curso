@@ -1,28 +1,30 @@
 # tests/conftest.py
 import os
 import sys
+import importlib
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-# força o modo de teste ANTES de importar db/main/models
+# 1) força modo de teste ANTES de qualquer import que crie engine
 os.environ.setdefault("PYTEST_RUNNING", "1")
 
-# opcional: se você preferir usar arquivo sqlite persistente durante CI,
-# descomente a linha abaixo (útil para diagnosticar problemas de in-memory)
-# os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+# 2) remove módulos que possam ter sido importados antes (garante re-criação correta do engine)
+for m in ("db", "models", "main"):
+    if m in sys.modules:
+        del sys.modules[m]
 
+# 3) agora importe db e modelos com o PYTEST_RUNNING já definido
 from db import Base, engine
-# importe o módulo que define LivroDB (ajuste se estiver em app.models)
-import models  # noqa: F401
+import models  # garante que LivroDB seja registrado no MetaData
 
-# debug curto para confirmar que o modelo foi registrado
-print("DEBUG: tabelas registradas no MetaData:", list(Base.metadata.tables.keys()))
-print("DEBUG: engine url:", getattr(engine, "url", str(engine)))
-print("DEBUG: engine id:", id(engine))
+# debug curto (remova depois)
+print("DEBUG conftest: Base tables before create_all:", list(Base.metadata.tables.keys()))
+print("DEBUG conftest: engine id:", id(engine))
+print("DEBUG conftest: engine url:", getattr(engine, "url", str(engine)))
 
-# cria as tabelas agora, antes da coleta/import dos testes
+# 4) cria as tabelas agora, antes da coleta/import dos testes
 Base.metadata.create_all(bind=engine)
 
 import pytest
