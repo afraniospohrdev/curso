@@ -1,8 +1,17 @@
 # tests/conftest.py
 import os, sys
 import pytest
-from db import SessionLocal
+from db import SessionLocal, Base, engine
+import models
 
+# Cria as tabelas antes de qualquer teste
+@pytest.fixture(scope="session", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
+# Fornece uma sessão para cada teste
 @pytest.fixture
 def db_session():
     session = SessionLocal()
