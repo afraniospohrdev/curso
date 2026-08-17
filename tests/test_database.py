@@ -1,32 +1,15 @@
+import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from main import Base, LivroDB, app, sessao_db
-
-DATABASE_URL_TEST = "sqlite:///:memory:"
-engine = create_engine(DATABASE_URL_TEST, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-# sobrescreve a dependência para usar o banco de teste
-def override_sessao_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-app.dependency_overrides[sessao_db] = override_sessao_db
+from main import app
+from db import SessionLocal
+from models import LivroDB
 
 client = TestClient(app)
 
-# Fixture que popula o banco
-import pytest
-
+# Fixture que popula o banco antes dos testes
 @pytest.fixture(autouse=True)
-def popular_db():
-    db = TestingSessionLocal()
+def populate_db():
+    db = SessionLocal()
     livros = [
         LivroDB(nome_livro="A Revolução dos Bichos", autor_livro="George Orwell", ano_livro=1945),
         LivroDB(nome_livro="1984", autor_livro="George Orwell", ano_livro=1949),
