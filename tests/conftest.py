@@ -1,5 +1,15 @@
 # tests/conftest.py
 import os, sys
+import pytest
+from db import SessionLocal
+
+@pytest.fixture
+def db_session():
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if ROOT not in sys.path:
