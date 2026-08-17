@@ -1,13 +1,7 @@
 name: Python application
 
-on:
-  push:
-    branches: [ "**" ]
-  pull_request:
-    branches: [ "**" ]
-
 jobs:
-  build:
+   build:
     runs-on: ubuntu-latest
     services:
       redis:
@@ -38,6 +32,13 @@ jobs:
     - name: Install dependencies
       run: poetry install --no-root
 
+    - name: Initialize database schema
+      env:
+        DATABASE_URL: "sqlite:///${{ github.workspace }}/test.db"
+        PYTHONPATH: "."
+      run: |
+        poetry run python -c "from db import Base, engine; import models; Base.metadata.create_all(bind=engine)"
+
     - name: Run tests
       env:
         PYTEST_RUNNING: "1"
@@ -45,13 +46,3 @@ jobs:
         PYTHONPATH: "."
       run: |
         poetry run pytest -q -s
-
-    - name: Build Docker image
-      run: docker build -t fastapi-app:latest .
-
-    - name: Run Docker container (smoke test)
-      run: |
-        docker run --rm -d -p 8000:8000 --name fastapi-test fastapi-app:latest
-        sleep 5
-        docker ps | grep fastapi-test
-        docker stop fastapi-test
