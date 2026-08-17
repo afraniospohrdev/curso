@@ -6,10 +6,12 @@ from models import LivroDB
 
 client = TestClient(app)
 
-# Fixture que popula o banco antes dos testes
+# Fixture que limpa e popula o banco antes dos testes
 @pytest.fixture(autouse=True)
 def populate_db():
     db = SessionLocal()
+    db.query(LivroDB).delete()
+    db.commit()
     livros = [
         LivroDB(nome_livro="A Revolução dos Bichos", autor_livro="George Orwell", ano_livro=1945),
         LivroDB(nome_livro="1984", autor_livro="George Orwell", ano_livro=1949),
