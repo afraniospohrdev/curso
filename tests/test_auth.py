@@ -14,14 +14,12 @@ def mock_redis(mocker):
     mock_redis_client = mocker.patch("main.redis_client", autospec=True)
     mock_redis_client.get.return_value = None
 
-# Fixture que popula o banco antes dos testes
+# Fixture que limpa e popula o banco antes dos testes
 @pytest.fixture(autouse=True)
 def populate_db():
     db = SessionLocal()
-    # limpa a tabela antes de inserir
     db.query(LivroDB).delete()
     db.commit()
-    
     livro = LivroDB(nome_livro="Teste", autor_livro="Autor", ano_livro=2024)
     db.add(livro)
     db.commit()
