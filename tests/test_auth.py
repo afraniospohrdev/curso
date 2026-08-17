@@ -18,6 +18,10 @@ def mock_redis(mocker):
 @pytest.fixture(autouse=True)
 def populate_db():
     db = SessionLocal()
+    # limpa a tabela antes de inserir
+    db.query(LivroDB).delete()
+    db.commit()
+    
     livro = LivroDB(nome_livro="Teste", autor_livro="Autor", ano_livro=2024)
     db.add(livro)
     db.commit()
